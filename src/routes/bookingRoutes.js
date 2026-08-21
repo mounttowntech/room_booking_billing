@@ -15,6 +15,13 @@ router.post(
   bookingController.createBooking
 );
 
+// update booking
+router.put(
+  "/:id",
+  verifyToken,
+  bookingController.updateBooking
+);
+
 router.get(
   "/all",
   verifyToken,

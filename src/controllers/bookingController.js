@@ -43,6 +43,51 @@ exports.createBooking = async (
 };
 
 // ============================================================
+// UPDATE BOOKING
+// ============================================================
+
+exports.updateBooking = async (
+  req,
+  res
+) => {
+  try {
+    const booking =
+      await bookingService.updateBooking({
+        bookingId:
+          req.params.id,
+
+        data:
+          req.body,
+
+        updatedBy:
+          req.user?._id,
+      });
+
+    res.json({
+      success: true,
+
+      message:
+        "Booking updated successfully",
+
+      data: booking,
+    });
+  } catch (error) {
+    console.log(
+      "Update Booking Error:",
+      error
+    );
+    res.status(400).json({
+      success: false,
+
+      message:
+        error.message,
+    });
+  }
+};
+
+
+
+// ============================================================
 // GET BOOKINGS
 // ============================================================
 

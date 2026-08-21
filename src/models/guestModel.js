@@ -76,6 +76,12 @@ const guestSchema = new mongoose.Schema(
       trim: true,
     },
 
+    status: {
+      type: String,
+      enum: ["active", "inactive"],
+      default: "active",
+    },
+
     isDeleted: {
       type: Boolean,
       default: false,

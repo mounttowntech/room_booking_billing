@@ -629,9 +629,18 @@ exports.updateBooking = async ({
         data.taxPercent ??
         0,
 
-      paidAmount:
-        booking.paidAmount,
+      paidAmount: data.paidAmount ?? booking.paidAmount,
     });
+
+  //   console.log(
+  //   "Calculated booking:",
+  //   booking
+  // );  
+
+  //   console.log(
+  //   "Calculated billing:",
+  //   billing
+  // );
 
   booking.roomId =
     newRoomId;
@@ -660,11 +669,9 @@ exports.updateBooking = async ({
   booking.totalAmount =
     billing.totalAmount;
 
-  booking.dueAmount =
-    billing.dueAmount;
+  booking.dueAmount = data.dueAmount ?? billing.dueAmount;
 
-  booking.paymentStatus =
-    billing.paymentStatus;
+  booking.paymentStatus = data.paymentStatus ?? billing.paymentStatus;
 
   if (data.adults !== undefined) {
     booking.adults =
