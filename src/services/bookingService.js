@@ -673,6 +673,8 @@ exports.updateBooking = async ({
 
   booking.paymentStatus = data.paymentStatus ?? billing.paymentStatus;
 
+  booking.bookingStatus = data.bookingStatus ?? booking.bookingStatus;
+
   if (data.adults !== undefined) {
     booking.adults =
       data.adults;
