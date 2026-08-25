@@ -219,7 +219,8 @@ exports.createInvoice = async ({
       "guestId",
       "guestCode name phone email"
     )
-    .populate("bookingId");
+    .populate("bookingId")
+    .populate("bookingId.roomId");
 };
 
 // ============================================================
@@ -246,18 +247,41 @@ exports.getInvoices = async ({
     };
   }
 
-  return Invoice.find(filter)
-    .populate(
-      "guestId",
-      "guestCode name phone email"
-    )
-    .populate(
-      "bookingId",
-      "bookingNo checkInDate checkOutDate bookingStatus"
-    )
-    .sort({
-      createdAt: -1,
-    });
+  // return Invoice.find(filter)
+  //   .populate(
+  //     "guestId",
+  //     "guestCode name phone email"
+  //   )
+  //   .populate(
+  //     "bookingId",
+  //     "bookingNo checkInDate checkOutDate bookingStatus"
+  //   )
+  //   //get room number from bookingId
+  //   .populate(
+  //     "bookingId.roomId",
+  //     "roomNumber roomType floor"
+  //   )
+  //   .sort({
+  //     createdAt: -1,
+  //   });
+
+    return Invoice.find(filter)
+  .populate(
+    "guestId",
+    "guestCode name phone email"
+  )
+  .populate({
+    path: "bookingId",
+    select:
+      "bookingNo checkInDate checkOutDate bookingStatus roomId",
+    populate: {
+      path: "roomId",
+      select: "roomNumber roomType floor",
+    },
+  })
+  .sort({
+    createdAt: -1,
+  });
 };
 
 // ============================================================
@@ -274,7 +298,8 @@ exports.getInvoiceById = async (
       isDeleted: false,
     })
       .populate("guestId")
-      .populate("bookingId");
+      .populate("bookingId")
+      .populate("bookingId.roomId");
 
   if (!invoice) {
     throw new Error(

@@ -1,6 +1,9 @@
 const Booking = require("../models/bookingModel");
 const Room = require("../models/roomModel");
 const Guest = require("../models/guestModel");
+const Invoice = require("../models/invoiceModel");
+
+const {createInvoice} = require("../services/invoiceService");
 
 const generateBookingNo = require(
   "../utils/generateBookingNo"
@@ -428,11 +431,45 @@ exports.checkOutBooking = async ({
     );
   }
 
+   // ----------------------------------------------------------
+  // Check Existing Invoice
+  // ----------------------------------------------------------
+
+  let invoice =
+    await Invoice.findOne({
+      bookingId: booking._id,
+      isDeleted: false,
+      status: {
+        $ne: "cancelled",
+      },
+    });
+
+  // ----------------------------------------------------------
+  // Create Invoice if not exists
+  // ----------------------------------------------------------
+// discount = 0,
+//   taxPercent = 0,
+//   dueDate,
+//   notes,
+//   createdBy
+  if (!invoice) {
+    invoice = await createInvoice({
+  bookingId: booking._id,
+  guestId: booking.guestId,
+  discount: booking.discount || 0,
+  taxPercent: booking.taxPercent || 0,
+  dueDate: new Date(),
+  notes: booking.notes,
+  createdBy: updatedBy,
+});
+
+  }
+
   if (
-    Number(booking.dueAmount) > 0
+   Number(invoice.dueAmount) > 0
   ) {
     throw new Error(
-      `Pending payment of ₹${booking.dueAmount} must be collected before checkout`
+      `Pending payment of ₹${invoice.dueAmount} must be collected before checkout`
     );
   }
 
