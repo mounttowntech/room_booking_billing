@@ -15,6 +15,7 @@ const {
   resetPassword,
   changePassword,
   me,
+  getHousekeepingStaff,
 } = require("../controllers/authController");
 
 // ============================================================
@@ -103,6 +104,16 @@ router.get(
   "/me",
   verifyToken,
   me
+);
+
+//============================================================
+// get housekeeping Staff
+//============================================================
+
+router.get(
+  "/housekeeping-staff",
+  verifyToken,
+  getHousekeepingStaff
 );
 
 // ============================================================

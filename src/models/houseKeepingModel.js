@@ -65,7 +65,4 @@ const housekeepingSchema = new mongoose.Schema(
     }
 );
 
-module.exports = mongoose.model(
-    "Housekeeping",
-    housekeepingSchema
-);
+module.exports = mongoose.models.Housekeeping || mongoose.model("Housekeeping", housekeepingSchema);

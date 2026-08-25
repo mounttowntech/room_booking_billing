@@ -1,3 +1,5 @@
+const Housekeeping = require("../models/housekeepingModel");
+const Room = require("../models/roomModel");
 const bookingService = require(
   "../services/bookingService"
 );
@@ -201,34 +203,145 @@ exports.checkIn = async (
 // CHECK OUT
 // ============================================================
 
-exports.checkOut = async (
-  req,
-  res
-) => {
+// exports.checkOut = async ( req, res) => {
+//   try {
+//     const booking =
+//       await bookingService.checkOutBooking({
+//         bookingId:
+//           req.params.id,
+
+//         updatedBy:
+//           req.user?._id,
+//       });
+
+//     res.json({
+//       success: true,
+
+//       message:
+//         "Guest checked out successfully",
+
+//       data: booking,
+//     });
+//   } catch (error) {
+//     res.status(400).json({
+//       success: false,
+
+//       message:
+//         error.message,
+//     });
+//   }
+// };
+exports.checkOut  = async (req, res) => {
   try {
-    const booking =
-      await bookingService.checkOutBooking({
-        bookingId:
-          req.params.id,
+    const { id } = req.params;
 
-        updatedBy:
-          req.user?._id,
+    // ==========================================================
+    // FIND BOOKING
+    // ==========================================================
+
+    const booking = await Booking.findOne({
+      _id: id,
+      isDeleted: false,
+    });
+
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: "Booking not found",
       });
+    }
 
-    res.json({
+    // ==========================================================
+    // CHECK CURRENT STATUS
+    // ==========================================================
+
+    if (booking.bookingStatus !== "checked_in") {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Only checked-in bookings can be checked out",
+      });
+    }
+
+    // ==========================================================
+    // UPDATE BOOKING
+    // ==========================================================
+
+    booking.bookingStatus = "checked_out";
+    booking.updatedBy = req.user?._id;
+
+    await booking.save();
+
+    // ==========================================================
+    // UPDATE ROOM STATUS
+    // ==========================================================
+
+    await Room.findByIdAndUpdate(
+      booking.roomId,
+      {
+        status: "cleaning",
+      }
+    );
+
+    // Check existing housekeeping task
+const existingTask =
+  await Housekeeping.findOne({
+    roomId: booking.roomId,
+    taskType: "checkout_cleaning",
+    status: {
+      $in: [
+        "pending",
+        "in_progress",
+      ],
+    },
+  });
+
+
+// Create only if no active task exists
+let housekeepingTask = existingTask;
+
+if (!existingTask) {
+  housekeepingTask =
+    await Housekeeping.create({
+      roomId: booking.roomId,
+
+      taskType: "checkout_cleaning",
+
+      status: "pending",
+
+      priority: "medium",
+
+      notes: `Checkout cleaning for booking ${booking.bookingNo}`,
+
+      createdBy: req.user?._id,
+    });
+}
+
+    // ==========================================================
+    // RESPONSE
+    // ==========================================================
+
+     res.json({
       success: true,
 
       message:
-        "Guest checked out successfully",
+        "Guest checked out and housekeeping task created successfully",
 
-      data: booking,
+      data: {
+        booking,
+        housekeepingTask,
+      },
     });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
 
-      message:
-        error.message,
+  } catch (error) {
+    console.error(
+      "Checkout error:",
+      error
+    );
+
+     res.status(500).json({
+      success: false,
+      message: error.message,
     });
   }
 };

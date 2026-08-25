@@ -1027,3 +1027,27 @@ exports.me = async (req, res) => {
     });
   }
 };
+
+// ============================================================
+// get housekeeping staff
+// ============================================================
+exports.getHousekeepingStaff = async (req, res) => {
+  try {
+    const staff = await UserModel.find({
+      role: "housekeeping",
+    }).select("-password");
+
+    return res.status(200).json({
+      success: true,
+      count: staff.length,
+      data: staff,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
