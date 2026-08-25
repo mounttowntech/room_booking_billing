@@ -28,6 +28,9 @@ router.get(
   bookingController.getBookings
 );
 
+// get  all booking payment summary
+router.get("/payment-summary", verifyToken, bookingController.getBookingPaymentSummary);
+
 router.get(
   "/:id",
   verifyToken,

@@ -271,3 +271,37 @@ exports.cancelBooking = async (
     });
   }
 };
+
+
+// ============================================================
+// GET BOOKING PAYMENT SUMMARY
+// ============================================================
+
+exports.getBookingPaymentSummary = async (req, res) => {
+  try {
+    console.log("Fetching booking payment summary...");
+    const summary =
+      await bookingService.getBookingPaymentSummary();
+console.log("Booking Payment Summary:", summary);
+
+    res.json({
+      success: true,
+      count: summary.length,
+      data: summary,
+    });
+  } catch (error) {
+    console.log(
+      "Get Booking Payment Summary Error:",
+      error
+    );
+    console.error(
+      "Get Booking Payment Summary Error:",
+      error
+    );
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

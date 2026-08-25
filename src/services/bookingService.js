@@ -716,3 +716,45 @@ exports.updateBooking = async ({
     .populate("guestId")
     .populate("roomId");
 };
+
+// ============================================================
+// GET BOOKING PAYMENT SUMMARY
+// ============================================================
+
+exports.getBookingPaymentSummary = async () => {
+  try {
+  const bookings = await Booking.find({
+    isDeleted: false,
+
+    paymentStatus: {
+      $in: [
+        "unpaid",
+        "partial",
+        "paid",
+      ],
+    },
+  })
+    .populate(
+      "guestId",
+      "guestCode name phone email"
+    )
+    .populate(
+      "roomId",
+      "roomNumber roomType pricePerNight"
+    )
+    .sort({
+      createdAt: -1,
+    })
+    .lean();
+
+    console.log("Booking payment summary:",  bookings);
+
+  return bookings;
+  } catch (error) {
+    console.log('error', error);
+    throw new Error(
+      "Error fetching booking payment summary: " +
+        error.message
+    );
+  }
+};
