@@ -3,6 +3,7 @@ const Room = require("../models/roomModel");
 const bookingService = require(
   "../services/bookingService"
 );
+const Booking = require("../models/bookingModel");
 
 // ============================================================
 // CREATE BOOKING

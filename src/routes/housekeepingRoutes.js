@@ -27,4 +27,11 @@ router.put(
   housekeepingController.updateTaskStatus
 );
 
+//assign task to staff
+router.put(
+  "/assign/:id",
+  verifyToken,
+  housekeepingController.assignTask
+);
+
 module.exports = router;

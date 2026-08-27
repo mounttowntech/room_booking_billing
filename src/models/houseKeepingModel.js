@@ -22,7 +22,7 @@ const housekeepingSchema = new mongoose.Schema(
 
         assignedTo: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
+            ref: "UserModel",
         },
 
         status: {
@@ -52,12 +52,12 @@ const housekeepingSchema = new mongoose.Schema(
 
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
+            ref: "UserModel",
         },
 
         updatedBy: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
+            ref: "UserModel",
         },
     },
     {

@@ -241,25 +241,89 @@ exports.getDashboard = async () => {
     // ROOM OCCUPANCY
     // --------------------------------------------------------
 
-    Room.aggregate([
-      {
-        $match: {
-          isDeleted: false,
+   Room.aggregate([
+  {
+    $match: {
+      isDeleted: false,
+      isActive: true,
+    },
+  },
 
-          isActive: true,
+  {
+    $project: {
+      _id: 0,
+      room: "$roomNumber",
+
+      occupancy: {
+        $switch: {
+          branches: [
+            {
+              case: {
+                $eq: ["$status", "occupied"],
+              },
+              then: 100,
+            },
+
+            {
+              case: {
+                $eq: ["$status", "reserved"],
+              },
+              then: 80,
+            },
+
+            {
+              case: {
+                $eq: ["$status", "cleaning"],
+              },
+              then: 30,
+            },
+
+            {
+              case: {
+                $eq: ["$status", "maintenance"],
+              },
+              then: 0,
+            },
+
+            {
+              case: {
+                $eq: ["$status", "available"],
+              },
+              then: 0,
+            },
+          ],
+
+          default: 0,
         },
       },
+    },
+  },
 
-      {
-        $group: {
-          _id: "$status",
+  {
+    $sort: {
+      room: 1,
+    },
+  },
+])
+    // Room.aggregate([
+    //   {
+    //     $match: {
+    //       isDeleted: false,
 
-          count: {
-            $sum: 1,
-          },
-        },
-      },
-    ]),
+    //       isActive: true,
+    //     },
+    //   },
+
+    //   {
+    //     $group: {
+    //       _id: "$status",
+
+    //       count: {
+    //         $sum: 1,
+    //       },
+    //     },
+    //   },
+    // ]),
   ]);
 
   // ----------------------------------------------------------

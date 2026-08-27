@@ -1,5 +1,4 @@
-const Housekeeping =
-  require("../models/houseKeepingModel");
+const Housekeeping =  require("../models/houseKeepingModel");
 
 const Room = require("../models/roomModel");
 
@@ -111,6 +110,40 @@ exports.updateTaskStatus = async (
     });
   } catch (error) {
     res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+exports.assignTask = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { assignedTo } = req.body;
+
+    const task = await Housekeeping.findById(id);
+
+    if (!task) {
+      return res.status(404).json({
+        success: false,
+        message: "Housekeeping task not found",
+      });
+    }
+
+    task.assignedTo = assignedTo;
+    task.status = "in_progress"; // Update status to in_progress when assigned
+    task.updatedBy = req.user?._id;
+
+    await task.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Housekeeping task assigned successfully",
+      data: task,
+    });
+
+  } catch (error) {
+    return res.status(500).json({
       success: false,
       message: error.message,
     });
